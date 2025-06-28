@@ -32,7 +32,7 @@ const Signup = () => {
         password: "",
         role: "user",
       });
-      navigate("/login");
+      // navigate("/login");
     } catch (error) {
       console.error("Signup failed:", error.response?.data || error.message);
 
