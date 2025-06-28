@@ -6,6 +6,8 @@ import CreateSlot from './pages/CreateSlot';
 import ViewSlots from './pages/ViewSlot';
 import EditSlot from './pages/EditSlot';
 import Dashboard from './pages/Dashboard';
+import AvailableSlots from './pages/AvailableSlots';
+import MyBookings from './pages/BookedSlots';
 const App = () => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
@@ -21,10 +23,13 @@ const App = () => {
         {/* Slot creation page */}
         <Route path="/createslot" element={<CreateSlot/> } />
         {/* slot viewing page  */}
-        <Route path = "/viewslots" element={<ViewSlots />} /> 
+        <Route path = "/myslots" element={<ViewSlots />} /> 
         {/* Edit slot page */}
         <Route path="/editslot/:id" element={<EditSlot />} />
-
+        {/* Available slots page */}
+        <Route path="/availableslots" element={<AvailableSlots />} />
+        {/* My bookings page */}
+        <Route path="/mybookings" element={<MyBookings />} />
 
         {/* Dashboard page */}
         <Route path="/dashboard" element={<Dashboard />} />
