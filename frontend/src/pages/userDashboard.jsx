@@ -15,6 +15,8 @@ const UserDashboard = () => {
   const fetchDashboardData = async () => {
   try {
      const token = localStorage.getItem("token");
+     const name = localStorage.getItem("name");
+     setUser({ name });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     // Fetch user info, bookings, and slots in parallel
@@ -215,7 +217,7 @@ const handleBookSlot = async (slotId) => {
 
                   <button
                     onClick={() => handleBookSlot(slot._id)}
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                    className="cursor-pointer w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
                   >
                     Book This Slot
                   </button>

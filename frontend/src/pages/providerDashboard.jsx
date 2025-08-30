@@ -38,11 +38,12 @@ const ProviderDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem("token");
+      const name = localStorage.getItem("name");
+      setUser({ name });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const [slotsRes, bookingsRes] = await Promise.all([
+      const [slotsRes] = await Promise.all([
         axios.get("/api/slot/view"),
-        // axios.get("/api/bookings/provider/received")
       ]);
       console.log("Slots data:", slotsRes.data);
 

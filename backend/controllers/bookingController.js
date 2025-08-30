@@ -27,6 +27,7 @@ exports.createBooking = async (req, res) => {
 exports.getBookings = async (req, res) => {
   const userId = req.user.userId;
 
+
   try {
     const bookings = await Booking.find({ userId })
   .populate({

@@ -58,9 +58,10 @@ const LoginPage = () => {
     const res = await axios.post('/api/auth/login', { ...formData, rememberMe });
     const token = res.data.token;
     const role = res.data.user.role;
-
+    const name = res.data.user.name;
     localStorage.setItem("token", token);
       localStorage.setItem("role", role);
+      localStorage.setItem("name", name);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       if(role === "serviceProvider"){
@@ -188,10 +189,10 @@ const LoginPage = () => {
               type="button"
               onClick={handleSubmit}
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              className="cursor-pointer w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
               {isLoading ? (
-                <div className="cursor-pointer flex items-center justify-center">
+                <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   Signing in...
                 </div>
