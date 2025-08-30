@@ -13,10 +13,7 @@
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.9.0",
     "fetch": "^1.1.0",
-<<<<<<< HEAD
     "lucide-react": "^0.487.0",
-=======
->>>>>>> e5532fcae28cb6895765d3fe8da0b958f72e1878
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2"

@@ -27,10 +27,6 @@ exports.createBooking = async (req, res) => {
 exports.getBookings = async (req, res) => {
   const userId = req.user.userId;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e5532fcae28cb6895765d3fe8da0b958f72e1878
   try {
     const bookings = await Booking.find({ userId })
   .populate({
