@@ -9,7 +9,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
+<<<<<<< HEAD
         target: 'https://appointment-app-u304.onrender.com/',
+=======
+        target: 'http://localhost:3000',
+>>>>>>> e5532fcae28cb6895765d3fe8da0b958f72e1878
         changeOrigin: true,
         secure: false
       }
