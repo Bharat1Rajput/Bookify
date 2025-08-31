@@ -51,12 +51,16 @@ const ProviderDashboard = () => {
       setUser({ name });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const [slotsRes] = await Promise.all([
+      const [slotsRes,bookingRes] = await Promise.all([
         axios.get("/api/slot/view"),
+        axios.get("/api/booking/provider/bookings")
+
+
       ]);
+      console.log(bookingRes.data[0]);
 
       setMySlots(slotsRes.data.filter(slot => !slot.isBooked));
-      setMyBookings(slotsRes.data.filter(slot => slot.isBooked));
+      setMyBookings(bookingRes.data);
     } catch (err) {
       console.error("Failed to fetch dashboard data", err);
     } finally {
@@ -526,13 +530,13 @@ const ProviderDashboard = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
-                        <span>{formatDate(booking.date)}</span>
+                        <span>{formatDate(booking.bookingDate)}</span>
                       </div>
                       <div className="flex items-center space-x-1">
                         <Clock className="h-4 w-4" />
                         <span>
-                          {formatTime(booking.startTime)} -{" "}
-                          {formatTime(booking.endTime)}
+                          {formatTime(booking.slotId?.startTime)} -{" "}
+                          {formatTime(booking.slotId?.endTime)}
                         </span>
                       </div>
                     </div>

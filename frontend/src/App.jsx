@@ -11,10 +11,10 @@ const ProtectedRoute = ({ children }) => {
   const role = localStorage.getItem('role');  
   
   if(children.type === ProviderDashboard && role !== 'serviceProvider') {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
   if(children.type === UserDashboard && role !== 'user') {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
