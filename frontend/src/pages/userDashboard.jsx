@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, LogOut, CheckCircle, Circle } from 'lucide-react';
+import { Calendar, Clock, User, LogOut, CheckCircle, Circle, X } from 'lucide-react';
 import axios from 'axios';
 
 const UserDashboard = () => {
@@ -7,7 +7,15 @@ const UserDashboard = () => {
   const [myBookings, setMyBookings] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [unbookingId, setUnbookingId] = useState(null);
+  const [notification, setNotification] = useState(null);
 
+  const showNotification = (message, type = 'success') => {
+  setNotification({ message, type });
+  setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+};
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -55,13 +63,47 @@ const handleBookSlot = async (slotId) => {
     if (response.status === 200 || response.status === 201) {
       // Refresh data after booking
       fetchDashboardData();
-      alert('Slot booked successfully!');
+      showNotification('Slot booked successfully!', 'success');
     } else {
       throw new Error('Booking failed');
     }
   } catch (error) {
     console.error('Error booking slot:', error);
-    alert('Failed to book slot. Please try again.');
+    showNotification('Failed to book slot. Please try again.', 'error');  }
+};
+
+// NEW UNBOOK FUNCTION
+const handleUnbook = async (bookingId) => {
+  try {
+    setUnbookingId(bookingId);
+    const token = localStorage.getItem('token');
+    console.log('Unbooking ID:', bookingId);
+    
+    const response = await axios.delete(
+      `/api/booking/cancel/${bookingId}`,
+      {},
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    console.log('Unbooking response:', response.data);
+
+    if (response.status === 200) {
+      // Refresh data after unbooking
+      fetchDashboardData();
+      showNotification('Booking cancelled successfully!', 'success');
+    } else {
+      throw new Error('Unbooking failed');
+    }
+  } catch (error) {
+    console.error('Error unbooking:', error);
+    showNotification('Failed to cancel booking. Please try again.', 'error');
+  } finally {
+    setUnbookingId(null);
   }
 };
 
@@ -98,6 +140,29 @@ const handleBookSlot = async (slotId) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+
+{notification && (
+  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+    notification.type === 'success' 
+      ? 'bg-green-500 text-white' 
+      : 'bg-red-500 text-white'
+  }`}>
+    <div className="flex items-center space-x-2">
+      {notification.type === 'success' ? (
+        <CheckCircle className="h-5 w-5" />
+      ) : (
+        <AlertCircle className="h-5 w-5" />
+      )}
+      <span className="font-medium">{notification.message}</span>
+      <button 
+        onClick={() => setNotification(null)}
+        className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  </div>
+)}
       {/* Header */}
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-4">
@@ -154,7 +219,7 @@ const handleBookSlot = async (slotId) => {
                       Confirmed
                     </span>
                   </div>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                  <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
                       <span>{formatDate(booking.bookingDate)}</span>
@@ -166,6 +231,26 @@ const handleBookSlot = async (slotId) => {
                       </span>
                     </div>
                   </div>
+                  
+                  {/* UNBOOK BUTTON - NEW */}
+                  
+                  <button
+                    onClick={() => handleUnbook(booking._id)}
+                    disabled={unbookingId === booking._id}
+                    className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    {unbookingId === booking._id ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Unbooking...</span>
+                      </>
+                    ) : (
+                      <>
+                        <X className="h-4 w-4" />
+                        <span>Unbook</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               ))}
             </div>

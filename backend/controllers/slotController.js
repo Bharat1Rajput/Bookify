@@ -9,6 +9,9 @@ exports.createSlot = async (req, res) => {
         .status(400)
         .json({ message: "Start time must be before end time" });
     }
+    if (new Date(date) < new Date().setHours(0, 0, 0, 0)) {
+      return res.status(409).json({ message: "Date must be in the future" });
+    }
 
     const newSlot = new Slot({
       date,

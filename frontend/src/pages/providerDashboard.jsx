@@ -10,11 +10,14 @@ import {
   Edit,
   Save,
   X,
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 import axios from "axios";
 
 const ProviderDashboard = () => {
   const [user, setUser] = useState(null);
+  const [notification, setNotification] = useState(null);
   const [mySlots, setMySlots] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +37,13 @@ const ProviderDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
+  
+ const showNotification = (message, type = 'success') => {
+  setNotification({ message, type });
+  setTimeout(() => {
+    setNotification(null);
+  }, 3000);
+};
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -45,7 +54,6 @@ const ProviderDashboard = () => {
       const [slotsRes] = await Promise.all([
         axios.get("/api/slot/view"),
       ]);
-      console.log("Slots data:", slotsRes.data);
 
       setMySlots(slotsRes.data.filter(slot => !slot.isBooked));
       setMyBookings(slotsRes.data.filter(slot => slot.isBooked));
@@ -58,27 +66,42 @@ const ProviderDashboard = () => {
 
   const handleCreateSlot = async () => {
     if (!newSlot.date || !newSlot.startTime || !newSlot.endTime) {
-      alert("Please fill in all fields");
+      showNotification('All fields are required to create a slot.', 'error');
       return;
     }
-    
     try {
-      const token = localStorage.getItem("token");
-      await axios.post("/api/slot/create", newSlot, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+  const token = localStorage.getItem("token");
+  console.log("Creating slot with data:", newSlot);
+  const response = await axios.post("/api/slot/create", newSlot, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  console.log("Create slot response:", response);
+  
+  // This will only run for successful responses (200-299)
+  setNewSlot({ date: "", startTime: "", endTime: "" });
+  setShowCreateForm(false);
+  fetchDashboardData();
+  showNotification(response.data.message || 'Slot created successfully!', 'success');
+  
+} catch (error) {
+  console.error("Error creating slot:", error);
+  
+  // Handle 400 and other error status codes here
+  if (error.response?.status === 400) {
+    const errorMessage = error.response.data.message || "Start time must be before end time";
+    showNotification(errorMessage, 'error');}
+  else if (error.response?.status === 409) {
+    const errorMessage = error.response.data.message || "you cannot create slot in past";
+    showNotification(errorMessage, 'error');
 
-      setNewSlot({ date: "", startTime: "", endTime: "" });
-      setShowCreateForm(false);
-      fetchDashboardData();
-      alert("Slot created successfully!");
-    } catch (error) {
-      console.error("Error creating slot:", error);
-      alert("Failed to create slot. Please try again.");
-    }
+  } else {
+    const errorMessage = error.response?.data?.message || 'Failed to create slot. Please try again.';
+    showNotification(errorMessage, 'error');
+  }
+}
   };
 
   const handleEditSlot = (slot) => {
@@ -107,12 +130,14 @@ const ProviderDashboard = () => {
       setEditingSlot(null);
       setEditFormData({ date: "", startTime: "", endTime: "" });
       fetchDashboardData();
-      alert("Slot updated successfully!");
+      showNotification('Slot updated successfully!', 'success');
     } catch (err) {
       console.error("Update failed:", err);
-      alert("Error updating slot. Please try again.");
-    }
+
+      showNotification('Failed to update slot. Please try again.', 'error');}
   };
+
+
 
   const handleCancelEdit = () => {
     setEditingSlot(null);
@@ -122,7 +147,7 @@ const ProviderDashboard = () => {
   const handleDeleteSlot = async (slotId) => {
     // if slot is booked then it should not be deleted
     if(mySlots.find(slot => slot._id === slotId).isBooked){
-      alert("Cannot delete a booked slot.");
+      showNotification('Cannot delete a booked slot.', 'error');
       return;
     };
     if (window.confirm("Are you sure you want to delete this slot?")) {
@@ -137,10 +162,10 @@ const ProviderDashboard = () => {
         });
 
         fetchDashboardData();
-        alert("Slot deleted successfully!");
+        showNotification('Slot deleted successfully!', 'success');
       } catch (error) {
         console.error("Error deleting slot:", error);
-        alert("Failed to delete slot. Please try again.");
+        showNotification('Failed to delete slot. Please try again.', 'error');
       }
     }
   };
@@ -178,7 +203,29 @@ const ProviderDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
-      {/* Header */}
+
+{notification && (
+  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+    notification.type === 'success' 
+      ? 'bg-green-500 text-white' 
+      : 'bg-red-500 text-white'
+  }`}>
+    <div className="flex items-center space-x-2">
+      {notification.type === 'success' ? (
+        <CheckCircle className="h-5 w-5" />
+      ) : (
+        <AlertCircle className="h-5 w-5" />
+      )}
+      <span className="font-medium">{notification.message}</span>
+      <button 
+        onClick={() => setNotification(null)}
+        className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  </div>
+)}
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
