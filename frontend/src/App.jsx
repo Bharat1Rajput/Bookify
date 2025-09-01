@@ -4,7 +4,7 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import UserDashboard from './pages/userDashboard';
 import ProviderDashboard from './pages/providerDashboard';
-import AppointmentLanding from './pages/landingPage';
+import AppointmentLanding from './pages/LandingPage';
 import BookifyPolicy from './pages/Policy';
 
 const ProtectedRoute = ({ children }) => {
