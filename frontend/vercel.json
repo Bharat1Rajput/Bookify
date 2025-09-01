@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://appointment-app-u304.onrender.com/api/$1" }
+  ]
+}
