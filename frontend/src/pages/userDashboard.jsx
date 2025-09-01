@@ -36,7 +36,7 @@ const UserDashboard = () => {
 
     // Responses are already parsed in axios (no need .json())
     setAvailableSlots(slotsResponse.data);
-    setMyBookings(bookingsResponse.data);
+    setMyBookings(bookingsResponse.data.message === 'No bookings found' ? [] : bookingsResponse.data);
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
   } finally {
