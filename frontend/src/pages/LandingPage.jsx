@@ -62,7 +62,7 @@ export default function AppointmentLanding() {
                 <Calendar className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AppointMe
+               Bookify
               </span>
             </div>
             
@@ -105,8 +105,13 @@ export default function AppointmentLanding() {
                   <span className="text-gray-900">Work Better</span>
                 </h1>
                 <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
-                  Transform your appointment management with AI-powered scheduling, 
-                  automated reminders, and seamless team collaboration.
+                 Time is the one resource we can never earn back. Every missed appointment is a missed opportunity for growth, for connection, for success. That’s why we built this platform:
+                  to help you take control of your schedule, 
+                  eliminate the chaos of double bookings, 
+                  and make every minute count. 
+                  <br />
+                  
+                  Because when your time is organized, your goals are closer than ever.
                 </p>
               </div>
              
@@ -130,7 +135,7 @@ export default function AppointmentLanding() {
                       <CheckCircle className="w-10 h-10 text-white" />
                     </div>
                     <h3 className="text-3xl font-bold text-gray-900 mb-3">Ready to Get Started?</h3>
-                    <p className="text-gray-600 text-lg">Join thousands of professionals who trust AppointMe for their scheduling needs</p>
+                    <p className="text-gray-600 text-lg">Join thousands of professionals who trust Bookify for their scheduling needs</p>
                   </div>
                   
                   {/* Action Buttons */}
@@ -247,7 +252,7 @@ export default function AppointmentLanding() {
             Ready to transform your scheduling?
           </h2>
           <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-            Join thousands of businesses already using AppointMe to streamline their operations
+            Join thousands of businesses already using Bookify to streamline their operations
           </p>
           <button
             onClick={() => navigate('/signup')}
@@ -267,16 +272,16 @@ export default function AppointmentLanding() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">AppointMe</span>
+              <span className="text-xl font-bold text-white">Bookify</span>
             </div>
             <div className="flex space-x-8 text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Privacy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms</a>
-              <a href="#" className="hover:text-white transition-colors">Support</a>
+              <a href="/policy" className="hover:text-white transition-colors">Privacy</a>
+              <a href="/policy" className="hover:text-white transition-colors">Terms</a>
+              <a href="/policy" className="hover:text-white transition-colors">Support</a>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 AppointMe. All rights reserved.</p>
+            <p>&copy; 2025 bookify. All rights reserved.</p>
           </div>
         </div>
       </footer>

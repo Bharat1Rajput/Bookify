@@ -63,7 +63,9 @@ const SignupPage = () => {
     setIsLoading(true);
 
     try {
+      console.log("this runs");
       const response = await axios.post('/api/auth/signup',formData); 
+      console.log('Signup successful:', response.data);
       navigate('/login'); // Redirect to login page after successful signup
     } catch (error) {
       console.error('Signup error:', error.response?.data || error.message);

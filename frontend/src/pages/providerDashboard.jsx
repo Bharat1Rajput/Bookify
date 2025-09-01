@@ -48,19 +48,28 @@ const ProviderDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const name = localStorage.getItem("name");
-      setUser({ name });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const [slotsRes,bookingRes] = await Promise.all([
-        axios.get("/api/slot/view"),
-        axios.get("/api/booking/provider/bookings")
+      // const [slotsRes,bookingRes] = await Promise.all([
+      //   axios.get("/api/slot/view"),
+      //   axios.get("/api/booking/provider/bookings")
 
 
-      ]);
-      console.log(bookingRes.data[0]);
+      // ]);
+      const slotsRes = await axios.get("/api/slot/view");
+      const bookingRes = await axios.get("/api/booking/provider/bookings");
+      
+      console.log("Slots response:", slotsRes.data[0]);
+      console.log("Bookings response:", bookingRes.data.message);
+      
 
-      setMySlots(slotsRes.data.filter(slot => !slot.isBooked));
+      if(bookingRes.status===200){
       setMyBookings(bookingRes.data);
+     } else {
+      setMyBookings([]);
+      }
+      setMySlots(slotsRes.data.filter(slot => !slot.isBooked));
+     
     } catch (err) {
       console.error("Failed to fetch dashboard data", err);
     } finally {

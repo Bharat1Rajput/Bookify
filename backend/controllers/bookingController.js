@@ -68,7 +68,7 @@ exports.getProviderBookingsSimple = async (req, res) => {
     const providerBookings = bookings.filter(booking => booking.slotId !== null);
 
     if (!providerBookings || providerBookings.length === 0) {
-      return res.status(404).json({ message: 'No bookings found for this provider' });
+      return res.status(200).json({ message: 'No bookings found for this provider' });
     }
 
     res.status(200).json(providerBookings);

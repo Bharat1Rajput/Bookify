@@ -237,7 +237,7 @@ const handleUnbook = async (bookingId) => {
                   <button
                     onClick={() => handleUnbook(booking._id)}
                     disabled={unbookingId === booking._id}
-                    className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                    className="cursor-pointer w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                   >
                     {unbookingId === booking._id ? (
                       <>

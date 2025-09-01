@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import UserDashboard from './pages/userDashboard';
 import ProviderDashboard from './pages/providerDashboard';
 import AppointmentLanding from './pages/landingPage';
+import BookifyPolicy from './pages/Policy';
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         {/* Login page */}
         <Route path="/login" element={<Login />} />
+        <Route path="/policy" element={<BookifyPolicy />} />
 
         {/* Dashboard page */}
         

@@ -59,7 +59,8 @@ const LoginPage = () => {
     const token = res.data.token;
     const role = res.data.user.role;
     const name = res.data.user.name;
-    localStorage.setItem("token", token);
+    
+      localStorage.setItem("token", token);
       localStorage.setItem("role", role);
       localStorage.setItem("name", name);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
