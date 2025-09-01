@@ -50,24 +50,14 @@ const ProviderDashboard = () => {
       const name = localStorage.getItem("name");
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      // const [slotsRes,bookingRes] = await Promise.all([
-      //   axios.get("/api/slot/view"),
-      //   axios.get("/api/booking/provider/bookings")
+      const [slotsRes,bookingRes] = await Promise.all([
+        axios.get("/api/slot/view"),
+        axios.get("/api/booking/provider/bookings")
 
 
-      // ]);
-      const slotsRes = await axios.get("/api/slot/view");
-      const bookingRes = await axios.get("/api/booking/provider/bookings");
-      
-      console.log("Slots response:", slotsRes.data[0]);
-      console.log("Bookings response:", bookingRes.data.message);
-      
-
-      if(bookingRes.status===200){
-      setMyBookings(bookingRes.data);
-     } else {
-      setMyBookings([]);
-      }
+      ]);
+      setUser({ name });
+      setMyBookings(bookingRes.data.message === 'No bookings found for this provider' ? [] : bookingRes.data);
       setMySlots(slotsRes.data.filter(slot => !slot.isBooked));
      
     } catch (err) {
@@ -84,14 +74,12 @@ const ProviderDashboard = () => {
     }
     try {
   const token = localStorage.getItem("token");
-  console.log("Creating slot with data:", newSlot);
   const response = await axios.post("/api/slot/create", newSlot, {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   });
-  console.log("Create slot response:", response);
   
   // This will only run for successful responses (200-299)
   setNewSlot({ date: "", startTime: "", endTime: "" });
