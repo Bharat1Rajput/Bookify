@@ -38,13 +38,13 @@ export default function AppointmentLanding() {
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
+      name: "Shreyansh Jain",
       role: "Business Owner",
       content: "This app transformed how we manage appointments. Our no-show rate dropped by 80%!",
       rating: 5
     },
     {
-      name: "Dr. Michael Chen",
+      name: "Dr. Kartik Mehta",
       role: "Healthcare Provider",
       content: "The automated reminders and easy rescheduling features save us hours every week.",
       rating: 5
@@ -122,7 +122,7 @@ export default function AppointmentLanding() {
                     <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <span className="text-gray-600">Trusted by 10,000+ businesses</span>
+                <span className="text-gray-600">Trusted by 10+ businesses</span>
               </div>
             </div>
             
@@ -171,10 +171,9 @@ export default function AppointmentLanding() {
                         </div>
                         <div className="flex items-center">
                           <Users className="w-4 h-4 mr-1 text-blue-500" />
-                          <span>50K+ Users</span>
+                          <span>20+ Users</span>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500">✓ No credit card required • ✓ 14-day free trial</p>
                     </div>
                   </div>
                 </div>
@@ -260,7 +259,6 @@ export default function AppointmentLanding() {
           >
             Start Your Free Trial
           </button>
-          <p className="text-gray-400 mt-4">No credit card required • 14-day free trial</p>
         </div>
       </section>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, UserCheck } from 'lucide-react';
+import { Eye, EyeOff, Mail,AlertCircle,X, Lock, User, UserCheck } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,9 +13,17 @@ const SignupPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  
   const navigate = useNavigate();
+  
+  const showNotification = (message, type = 'success') => {
+   setNotification({ message, type });
+   setTimeout(() => {
+     setNotification(null);
+   }, 3000);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,11 +72,10 @@ const SignupPage = () => {
 
     try {
       const response = await axios.post('/api/auth/signup',formData); 
-      console.log('Signup successful:', response.data);
+        showNotification('Signup successful! Please log in.', 'success');
       navigate('/login'); // Redirect to login page after successful signup
     } catch (error) {
-      console.error('Signup error:', error.response?.data || error.message);
-      alert(error.response?.data?.message || 'Signup failed');
+    showNotification(error.response?.data?.message || error.message, 'error');
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +92,30 @@ const SignupPage = () => {
           <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
         </div>
       </div>
+      {/* Put this right after: <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100"> */}
+
+{notification && (
+  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+    notification.type === 'success' 
+      ? 'bg-green-500 text-white' 
+      : 'bg-red-500 text-white'
+  }`}>
+    <div className="flex items-center space-x-2">
+      {notification.type === 'success' ? (
+        <CheckCircle className="h-5 w-5" />
+      ) : (
+        <AlertCircle className="h-5 w-5" />
+      )}
+      <span className="font-medium">{notification.message}</span>
+      <button 
+        onClick={() => setNotification(null)}
+        className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  </div>
+)}
 
       <div className="relative w-full max-w-md">
         {/* Glassmorphism Card */}
