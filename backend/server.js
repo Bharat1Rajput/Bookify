@@ -13,7 +13,10 @@ const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-app.use(cors());
+// Express example
+app.use(cors({
+  origin: ['https://appointment-app-topaz.vercel.app', 'http://localhost:3000']
+}));
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/slot',slotRoutes);
