@@ -11,7 +11,7 @@ import {
   Save,
   X,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import axios from "axios";
 
@@ -37,29 +37,30 @@ const ProviderDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-  
- const showNotification = (message, type = 'success') => {
-  setNotification({ message, type });
-  setTimeout(() => {
-    setNotification(null);
-  }, 3000);
-};
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem("token");
       const name = localStorage.getItem("name");
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const [slotsRes,bookingRes] = await Promise.all([
+      const [slotsRes, bookingRes] = await Promise.all([
         axios.get("/api/slot/view"),
-        axios.get("/api/booking/provider/bookings")
-
-
+        axios.get("/api/booking/provider/bookings"),
       ]);
       setUser({ name });
-      setMyBookings(bookingRes.data.message === 'No bookings found for this provider' ? [] : bookingRes.data);
-      setMySlots(slotsRes.data.filter(slot => !slot.isBooked));
-     
+      setMyBookings(
+        bookingRes.data.message === "No bookings found for this provider"
+          ? []
+          : bookingRes.data
+      );
+      setMySlots(slotsRes.data.filter((slot) => !slot.isBooked));
     } catch (err) {
       console.error("Failed to fetch dashboard data", err);
     } finally {
@@ -69,76 +70,72 @@ const ProviderDashboard = () => {
 
   const handleCreateSlot = async () => {
     if (!newSlot.date || !newSlot.startTime || !newSlot.endTime) {
-      showNotification('All fields are required to create a slot.', 'error');
+      showNotification("All fields are required to create a slot.", "error");
       return;
     }
+
     try {
-  const token = localStorage.getItem("token");
-  const response = await axios.post("/api/slot/create", newSlot, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
-  
-  // This will only run for successful responses (200-299)
-  setNewSlot({ date: "", startTime: "", endTime: "" });
-  setShowCreateForm(false);
-  fetchDashboardData();
-  showNotification(response.data.message || 'Slot created successfully!', 'success');
-  
-} catch (error) {
-  console.error("Error creating slot:", error);
-  
-  // Handle 400 and other error status codes here
-  if (error.response?.status === 400) {
-    const errorMessage = error.response.data.message || "Start time must be before end time";
-    showNotification(errorMessage, 'error');}
-  else if (error.response?.status === 409) {
-    const errorMessage = error.response.data.message || "you cannot create slot in past";
-    showNotification(errorMessage, 'error');
+      const token = localStorage.getItem("token");
+      const response = await axios.post("/api/slot/create", newSlot, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("response ", response);
+      // Only runs if status = 2xx
+      setNewSlot({ date: "", startTime: "", endTime: "" });
+      setShowCreateForm(false);
+      fetchDashboardData();
+      showNotification(
+        response.data.message || "Slot created successfully!",
+        "success"
+      );
+    } catch (error) {
+      console.error("Error creating slot:", error);
 
-  } else {
-    const errorMessage = error.response?.data?.message || 'Failed to create slot. Please try again.';
-    showNotification(errorMessage, 'error');
-  }
-}
-  };
+      if (error.response) {
+        const status = error.response.status;
+        const errorMessage =
+          error.response.data.message || "Something went wrong";
 
-  const handleEditSlot = (slot) => {
-    setEditingSlot(slot._id);
-    setEditFormData({
-      date: slot.date.split('T')[0], // Format date for input
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-    });
+        if (status === 401) {
+          showNotification(errorMessage, "error");
+        } else if (status === 400) {
+          // This includes overlap OR start>=end
+          showNotification(errorMessage, "error");
+        } else if (status === 409) {
+          // Date in the past
+          showNotification(errorMessage, "error");
+        } else {
+          showNotification(errorMessage, "error");
+        }
+      } else {
+        showNotification("Failed to create slot. Please try again.", "error");
+      }
+    }
   };
 
   const handleUpdateSlot = async (slotId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`/api/slot/edit/${slotId}`,
-        editFormData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    
-      
+      await axios.put(`/api/slot/edit/${slotId}`, editFormData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
       setEditingSlot(null);
       setEditFormData({ date: "", startTime: "", endTime: "" });
       fetchDashboardData();
-      showNotification('Slot updated successfully!', 'success');
+      showNotification("Slot updated successfully!", "success");
     } catch (err) {
       console.error("Update failed:", err);
 
-      showNotification('Failed to update slot. Please try again.', 'error');}
+      showNotification("Failed to update slot. Please try again.", "error");
+    }
   };
-
-
 
   const handleCancelEdit = () => {
     setEditingSlot(null);
@@ -147,14 +144,12 @@ const ProviderDashboard = () => {
 
   const handleDeleteSlot = async (slotId) => {
     // if slot is booked then it should not be deleted
-    if(mySlots.find(slot => slot._id === slotId).isBooked){
-      showNotification('Cannot delete a booked slot.', 'error');
+    if (mySlots.find((slot) => slot._id === slotId).isBooked) {
+      showNotification("Cannot delete a booked slot.", "error");
       return;
-    };
+    }
     if (window.confirm("Are you sure you want to delete this slot?")) {
-    try {
-
-
+      try {
         const token = localStorage.getItem("token");
         await axios.delete(`/api/slot/delete/${slotId}`, {
           headers: {
@@ -163,10 +158,10 @@ const ProviderDashboard = () => {
         });
 
         fetchDashboardData();
-        showNotification('Slot deleted successfully!', 'success');
+        showNotification("Slot deleted successfully!", "success");
       } catch (error) {
         console.error("Error deleting slot:", error);
-        showNotification('Failed to delete slot. Please try again.', 'error');
+        showNotification("Failed to delete slot. Please try again.", "error");
       }
     }
   };
@@ -204,29 +199,30 @@ const ProviderDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
-
-{notification && (
-  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
-    notification.type === 'success' 
-      ? 'bg-green-500 text-white' 
-      : 'bg-red-500 text-white'
-  }`}>
-    <div className="flex items-center space-x-2">
-      {notification.type === 'success' ? (
-        <CheckCircle className="h-5 w-5" />
-      ) : (
-        <AlertCircle className="h-5 w-5" />
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+            notification.type === "success"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          <div className="flex items-center space-x-2">
+            {notification.type === "success" ? (
+              <CheckCircle className="h-5 w-5" />
+            ) : (
+              <AlertCircle className="h-5 w-5" />
+            )}
+            <span className="font-medium">{notification.message}</span>
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       )}
-      <span className="font-medium">{notification.message}</span>
-      <button 
-        onClick={() => setNotification(null)}
-        className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  </div>
-)}
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -458,7 +454,6 @@ const ProviderDashboard = () => {
                               <Trash2 className="h-5 w-5" />
                             </button>
                           </div>
-                          
                         </div>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           <div className="flex items-center space-x-1">
@@ -515,13 +510,18 @@ const ProviderDashboard = () => {
                           {booking.userId?.name || "Customer"}
                         </span>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded capitalize ${
-                        booking.status === 'confirmed' ? 'bg-green-100 text-green-600' :
-                        booking.status === 'pending' ? 'bg-yellow-100 text-yellow-600' :
-                        booking.status === 'completed' ? 'bg-blue-100 text-blue-600' :
-                        'bg-red-100 text-red-600'
-                      }`}>
-                        {booking.status || 'Confirmed'}
+                      <span
+                        className={`text-xs px-2 py-1 rounded capitalize ${
+                          booking.status === "confirmed"
+                            ? "bg-green-100 text-green-600"
+                            : booking.status === "pending"
+                            ? "bg-yellow-100 text-yellow-600"
+                            : booking.status === "completed"
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {booking.status || "Confirmed"}
                       </span>
                     </div>
                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">

@@ -4,7 +4,7 @@ exports.createSlot = async (req, res) => {
   const { date, startTime, endTime } = req.body;
   const providerId = req.user.userId;
   console.log(date, startTime, endTime, providerId);
-console.log("sfkhkdjshfjksdkjf");
+
   try {
     // Validation: start < end
     if (startTime >= endTime) {
@@ -17,16 +17,14 @@ console.log("sfkhkdjshfjksdkjf");
     if (new Date(date) < new Date().setHours(0, 0, 0, 0)) {
       return res.status(409).json({ message: "Date must be in the future" });
     }
-  
+
     // Fetch all slots of provider on the same date
     const pastSlots = await Slot.find({ providerId, date });
-
 
     // Overlap check function
     const isOverlapping = (newSlot, pastSlots) => {
       const { startTime, endTime } = newSlot;
       for (let slot of pastSlots) {
-        
         if (startTime < slot.endTime && endTime > slot.startTime) {
           return true; // Overlap found
         }
@@ -57,7 +55,7 @@ console.log("sfkhkdjshfjksdkjf");
     // Save the new slot
     const newSlot = new Slot({ date, startTime, endTime, providerId });
     await newSlot.save();
-  
+
     res
       .status(201)
       .json({ message: "Slot created successfully", slot: newSlot });
@@ -66,7 +64,6 @@ console.log("sfkhkdjshfjksdkjf");
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 
 exports.getSlots = async (req, res) => {
   try {

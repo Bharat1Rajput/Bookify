@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, LogOut, CheckCircle, Circle, X } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  Calendar,
+  Clock,
+  User,
+  LogOut,
+  CheckCircle,
+  Circle,
+  X,
+} from "lucide-react";
+import axios from "axios";
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
@@ -10,125 +18,138 @@ const UserDashboard = () => {
   const [unbookingId, setUnbookingId] = useState(null);
   const [notification, setNotification] = useState(null);
 
-  const showNotification = (message, type = 'success') => {
-  setNotification({ message, type });
-  setTimeout(() => {
-    setNotification(null);
-  }, 3000);
-};
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
   useEffect(() => {
     fetchDashboardData();
   }, []);
 
   const fetchDashboardData = async () => {
-  try {
-     const token = localStorage.getItem("token");
-     const name = localStorage.getItem("name");
-     setUser({ name });
+    try {
+      const token = localStorage.getItem("token");
+      const name = localStorage.getItem("name");
+      setUser({ name });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-    // Fetch user info, bookings, and slots in parallel
-    const [ slotsResponse,bookingsResponse] = await Promise.all([
-      axios.get('/api/slot/available'), 
-      axios.get('/api/booking/view')
-      
-    ]);
+      // Fetch user info, bookings, and slots in parallel
+      const [slotsResponse, bookingsResponse] = await Promise.all([
+        axios.get("/api/slot/available"),
+        axios.get("/api/booking/view"),
+      ]);
 
-    
-    setAvailableSlots(slotsResponse.data);
-    console.log("Available slots:", slotsResponse.data);
-    setMyBookings(bookingsResponse.data.message === 'No bookings found' ? [] : bookingsResponse.data);
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-const handleBookSlot = async (slotId) => {
-  try {
-    const token = localStorage.getItem('token');
-    
-    const response = await axios.post(
-      `/api/booking/book/${slotId}`,
-      {},  
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    console.log('Booking response:', response.data);
-
-    if (response.status === 200 || response.status === 201) {
-      // Refresh data after booking
-      fetchDashboardData();
-      showNotification('Slot booked successfully!', 'success');
-    } else {
-      throw new Error('Booking failed');
+      setAvailableSlots(slotsResponse.data);
+      console.log("Available slots:", slotsResponse.data);
+      setMyBookings(
+        bookingsResponse.data.message === "No bookings found"
+          ? []
+          : bookingsResponse.data
+      );
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error booking slot:', error);
-    showNotification('Failed to book slot. Please try again.', 'error');  }
-};
+  };
 
-// NEW UNBOOK FUNCTION
-const handleUnbook = async (bookingId) => {
-  try {
-    setUnbookingId(bookingId);
-    const token = localStorage.getItem('token');
-    console.log('Unbooking ID:', bookingId);
-    
-    const response = await axios.delete(
-      `/api/booking/cancel/${bookingId}`,
-      {},
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+  const handleBookSlot = async (slotId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.post(
+        `/api/booking/book/${slotId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         }
+      );
+      console.log("Booking response:", response.data);
+
+      if (response.status === 200 || response.status === 201) {
+        // Refresh data after booking
+        fetchDashboardData();
+        showNotification("Slot booked successfully!", "success");
+      } else {
+        throw new Error("Booking failed");
       }
-    );
+    } catch (error) {
+      console.error("Error booking slot:", error);
 
-    console.log('Unbooking response:', response.data);
-
-    if (response.status === 200) {
-      // Refresh data after unbooking
-      fetchDashboardData();
-      showNotification('Booking cancelled successfully!', 'success');
-    } else {
-      throw new Error('Unbooking failed');
+      // Handle specific error messages from the backend
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        showNotification(error.response.data.message, "error");
+      } else {
+        showNotification("Failed to book slot. Please try again.", "error");
+      }
     }
-  } catch (error) {
-    console.error('Error unbooking:', error);
-    showNotification('Failed to cancel booking. Please try again.', 'error');
-  } finally {
-    setUnbookingId(null);
-  }
-};
+  };
+
+  // NEW UNBOOK FUNCTION
+  const handleUnbook = async (bookingId) => {
+    try {
+      setUnbookingId(bookingId);
+      const token = localStorage.getItem("token");
+      console.log("Unbooking ID:", bookingId);
+
+      const response = await axios.delete(
+        `/api/booking/cancel/${bookingId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Unbooking response:", response.data);
+
+      if (response.status === 200) {
+        // Refresh data after unbooking
+        fetchDashboardData();
+        showNotification("Booking cancelled successfully!", "success");
+      } else {
+        throw new Error("Unbooking failed");
+      }
+    } catch (error) {
+      console.error("Error unbooking:", error);
+      showNotification("Failed to cancel booking. Please try again.", "error");
+    } finally {
+      setUnbookingId(null);
+    }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
+    localStorage.removeItem("token");
+    window.location.href = "/login";
   };
 
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatTime = (time) => {
-    return new Date(`2000-01-01 ${time}`).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(`2000-01-01 ${time}`).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
- if (loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
@@ -141,29 +162,30 @@ const handleUnbook = async (bookingId) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-
-{notification && (
-  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
-    notification.type === 'success' 
-      ? 'bg-green-500 text-white' 
-      : 'bg-red-500 text-white'
-  }`}>
-    <div className="flex items-center space-x-2">
-      {notification.type === 'success' ? (
-        <CheckCircle className="h-5 w-5" />
-      ) : (
-        <AlertCircle className="h-5 w-5" />
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+            notification.type === "success"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          <div className="flex items-center space-x-2">
+            {notification.type === "success" ? (
+              <CheckCircle className="h-5 w-5" />
+            ) : (
+              <AlertCircle className="h-5 w-5" />
+            )}
+            <span className="font-medium">{notification.message}</span>
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       )}
-      <span className="font-medium">{notification.message}</span>
-      <button 
-        onClick={() => setNotification(null)}
-        className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  </div>
-)}
       {/* Header */}
       <header className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-4">
@@ -173,8 +195,12 @@ const handleUnbook = async (bookingId) => {
                 <User className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Welcome, {user?.name}!</h1>
-                <p className="text-sm text-indigo-600 font-medium">User Dashboard</p>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Welcome, {user?.name}!
+                </h1>
+                <p className="text-sm text-indigo-600 font-medium">
+                  User Dashboard
+                </p>
               </div>
             </div>
             <button
@@ -203,17 +229,22 @@ const handleUnbook = async (bookingId) => {
             <div className="text-center py-12">
               <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No bookings yet</p>
-              <p className="text-gray-400 text-sm">Book your first appointment below!</p>
+              <p className="text-gray-400 text-sm">
+                Book your first appointment below!
+              </p>
             </div>
           ) : (
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {myBookings.map((booking) => (
-                <div key={booking._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+                <div
+                  key={booking._id}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200"
+                >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <span className="font-semibold text-gray-900">
-                        {booking.slotId?.providerId?.name || 'Provider'}
+                        {booking.slotId?.providerId?.name || "Provider"}
                       </span>
                     </div>
                     <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
@@ -228,13 +259,14 @@ const handleUnbook = async (bookingId) => {
                     <div className="flex items-center space-x-1">
                       <Clock className="h-4 w-4" />
                       <span>
-                        {formatTime(booking.slotId?.startTime)} - {formatTime(booking.slotId?.endTime)}
+                        {formatTime(booking.slotId?.startTime)} -{" "}
+                        {formatTime(booking.slotId?.endTime)}
                       </span>
                     </div>
                   </div>
-                  
+
                   {/* UNBOOK BUTTON - NEW */}
-                  
+
                   <button
                     onClick={() => handleUnbook(booking._id)}
                     disabled={unbookingId === booking._id}
@@ -272,24 +304,29 @@ const handleUnbook = async (bookingId) => {
             <div className="text-center py-12">
               <Clock className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No available slots</p>
-              <p className="text-gray-400 text-sm">Check back later for new appointments!</p>
+              <p className="text-gray-400 text-sm">
+                Check back later for new appointments!
+              </p>
             </div>
           ) : (
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {availableSlots.map((slot) => (
-                <div key={slot._id } className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-blue-300">
+                <div
+                  key={slot._id}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-blue-300"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
                       <span className="font-semibold text-gray-900">
-                        {slot.providerId?.name || 'Available Provider'}
+                        {slot.providerId?.name || "Available Provider"}
                       </span>
                     </div>
                     <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
                       Available
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
@@ -297,7 +334,10 @@ const handleUnbook = async (bookingId) => {
                     </div>
                     <div className="flex items-center space-x-1">
                       <Clock className="h-4 w-4" />
-                      <span>{formatTime(slot.startTime)} - {formatTime(slot.endTime)}</span>
+                      <span>
+                        {formatTime(slot.startTime)} -{" "}
+                        {formatTime(slot.endTime)}
+                      </span>
                     </div>
                   </div>
 
@@ -319,16 +359,24 @@ const handleUnbook = async (bookingId) => {
         <div className="bg-white rounded-2xl shadow-lg p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600">{myBookings.length}</div>
+              <div className="text-2xl font-bold text-indigo-600">
+                {myBookings.length}
+              </div>
               <div className="text-sm text-gray-500">Total Bookings</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{availableSlots.length}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {availableSlots.length}
+              </div>
               <div className="text-sm text-gray-500">Available Now</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
-                {myBookings.filter(b => new Date(b.bookingDate) >= new Date()).length}
+                {
+                  myBookings.filter(
+                    (b) => new Date(b.bookingDate) >= new Date()
+                  ).length
+                }
               </div>
               <div className="text-sm text-gray-500">Upcoming</div>
             </div>

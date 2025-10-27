@@ -1,85 +1,92 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff, Mail,AlertCircle,X, Lock, User, UserCheck } from 'lucide-react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from "react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  AlertCircle,
+  X,
+  Lock,
+  User,
+  UserCheck,
+} from "lucide-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'user'
+    name: "",
+    email: "",
+    password: "",
+    role: "user",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [notification, setNotification] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
-  
-  const showNotification = (message, type = 'success') => {
-   setNotification({ message, type });
-   setTimeout(() => {
-     setNotification(null);
-   }, 3000);
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      newErrors.name = "Name is required";
     }
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
     }
-    
+
     if (!formData.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/auth/signup',formData); 
-        showNotification('Signup successful! Please log in.', 'success');
-      navigate('/login'); // Redirect to login page after successful signup
+      const response = await axios.post("/api/auth/signup", formData);
+      showNotification("Signup successful! Please log in.", "success");
+      navigate("/login"); // Redirect to login page after successful signup
     } catch (error) {
-    showNotification(error.response?.data?.message || error.message, 'error');
+      showNotification(error.response?.data?.message || error.message, "error");
     } finally {
       setIsLoading(false);
     }
-    
   };
 
   return (
@@ -94,28 +101,30 @@ const SignupPage = () => {
       </div>
       {/* Put this right after: <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100"> */}
 
-{notification && (
-  <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
-    notification.type === 'success' 
-      ? 'bg-green-500 text-white' 
-      : 'bg-red-500 text-white'
-  }`}>
-    <div className="flex items-center space-x-2">
-      {notification.type === 'success' ? (
-        <CheckCircle className="h-5 w-5" />
-      ) : (
-        <AlertCircle className="h-5 w-5" />
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm ${
+            notification.type === "success"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          <div className="flex items-center space-x-2">
+            {notification.type === "success" ? (
+              <CheckCircle className="h-5 w-5" />
+            ) : (
+              <AlertCircle className="h-5 w-5" />
+            )}
+            <span className="font-medium">{notification.message}</span>
+            <button
+              onClick={() => setNotification(null)}
+              className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       )}
-      <span className="font-medium">{notification.message}</span>
-      <button 
-        onClick={() => setNotification(null)}
-        className="ml-auto hover:bg-white hover:bg-opacity-20 rounded p-1"
-      >
-        <X className="h-4 w-4" />
-      </button>
-    </div>
-  </div>
-)}
 
       <div className="relative w-full max-w-md">
         {/* Glassmorphism Card */}
@@ -124,7 +133,9 @@ const SignupPage = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mb-4 shadow-lg">
               <UserCheck className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Create Account
+            </h1>
             <p className="text-white/70">Join us today and get started</p>
           </div>
 
@@ -142,12 +153,16 @@ const SignupPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   className={`w-full pl-12 pr-4 py-3 bg-white/10 border rounded-xl text-white placeholder-white/50 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 ${
-                    errors.name ? 'border-red-400 focus:ring-red-400' : 'border-white/30'
+                    errors.name
+                      ? "border-red-400 focus:ring-red-400"
+                      : "border-white/30"
                   }`}
                   placeholder="Enter your full name"
                 />
               </div>
-              {errors.name && <p className="text-red-400 text-sm">{errors.name}</p>}
+              {errors.name && (
+                <p className="text-red-400 text-sm">{errors.name}</p>
+              )}
             </div>
 
             {/* Email Field */}
@@ -163,12 +178,16 @@ const SignupPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className={`w-full pl-12 pr-4 py-3 bg-white/10 border rounded-xl text-white placeholder-white/50 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 ${
-                    errors.email ? 'border-red-400 focus:ring-red-400' : 'border-white/30'
+                    errors.email
+                      ? "border-red-400 focus:ring-red-400"
+                      : "border-white/30"
                   }`}
                   placeholder="Enter your email"
                 />
               </div>
-              {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-red-400 text-sm">{errors.email}</p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -179,12 +198,14 @@ const SignupPage = () => {
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   className={`w-full pl-12 pr-12 py-3 bg-white/10 border rounded-xl text-white placeholder-white/50 backdrop-blur-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 ${
-                    errors.password ? 'border-red-400 focus:ring-red-400' : 'border-white/30'
+                    errors.password
+                      ? "border-red-400 focus:ring-red-400"
+                      : "border-white/30"
                   }`}
                   placeholder="Create a password"
                 />
@@ -193,10 +214,16 @@ const SignupPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
-              {errors.password && <p className="text-red-400 text-sm">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-red-400 text-sm">{errors.password}</p>
+              )}
             </div>
 
             {/* Role Selection */}
@@ -210,34 +237,38 @@ const SignupPage = () => {
                     type="radio"
                     name="role"
                     value="user"
-                    checked={formData.role === 'user'}
+                    checked={formData.role === "user"}
                     onChange={handleChange}
                     className="sr-only"
                   />
-                  <div className={`p-4 rounded-xl border transition-all duration-200 text-center ${
-                    formData.role === 'user' 
-                      ? 'bg-purple-500/30 border-purple-400 text-white shadow-lg' 
-                      : 'bg-white/10 border-white/30 text-white/70 hover:bg-white/20'
-                  }`}>
+                  <div
+                    className={`p-4 rounded-xl border transition-all duration-200 text-center ${
+                      formData.role === "user"
+                        ? "bg-purple-500/30 border-purple-400 text-white shadow-lg"
+                        : "bg-white/10 border-white/30 text-white/70 hover:bg-white/20"
+                    }`}
+                  >
                     <User className="w-6 h-6 mx-auto mb-2" />
                     <span className="text-sm font-medium">User</span>
                   </div>
                 </label>
-                
+
                 <label className="relative cursor-pointer">
                   <input
                     type="radio"
                     name="role"
                     value="serviceProvider"
-                    checked={formData.role === 'serviceProvider'}
+                    checked={formData.role === "serviceProvider"}
                     onChange={handleChange}
                     className="sr-only"
                   />
-                  <div className={`p-4 rounded-xl border transition-all duration-200 text-center ${
-                    formData.role === 'serviceProvider' 
-                      ? 'bg-purple-500/30 border-purple-400 text-white shadow-lg' 
-                      : 'bg-white/10 border-white/30 text-white/70 hover:bg-white/20'
-                  }`}>
+                  <div
+                    className={`p-4 rounded-xl border transition-all duration-200 text-center ${
+                      formData.role === "serviceProvider"
+                        ? "bg-purple-500/30 border-purple-400 text-white shadow-lg"
+                        : "bg-white/10 border-white/30 text-white/70 hover:bg-white/20"
+                    }`}
+                  >
                     <UserCheck className="w-6 h-6 mx-auto mb-2" />
                     <span className="text-sm font-medium">Provider</span>
                   </div>
@@ -258,15 +289,18 @@ const SignupPage = () => {
                   Creating Account...
                 </div>
               ) : (
-                'Create Account'
+                "Create Account"
               )}
             </button>
           </div>
 
           <div className="mt-6 text-center">
             <p className="text-white/70">
-              Already have an account?{' '}
-              <a href="/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+              Already have an account?{" "}
+              <a
+                href="/login"
+                className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
+              >
                 Sign In
               </a>
             </p>
