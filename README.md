@@ -1,19 +1,10 @@
-# Appointment Booking System 📅
+# Bookify - An Appointment Booking System 📅
 
 A **production-ready full-stack appointment booking application** built with modern web technologies, featuring role-based authentication, slot management, and real-time booking capabilities for seamless user-provider interactions.
 
 ## 🚀 Live Demo
-- **API Base URL (backend):** https://appointment-app-u304.onrender.com
+- **click here** - https://appointment-app-topaz.vercel.app/
 
-## 📋 Table of Contents
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [API Documentation](#api-documentation)
-- [Security Features](#security-features)
-- [Learnings](#learnings)
-- [Contributing](#contributing)
 
 ## ✨ Features
 
@@ -22,7 +13,7 @@ A **production-ready full-stack appointment booking application** built with mod
 - 👥 **Role-Based Access** - Separate interfaces for Users and Service Providers
 - 📆 **Slot Management** - Create, edit, and delete time slots with overlap prevention
 - ✅ **Booking System** - View available slots, book appointments, and manage bookings
-- 🚫 **Conflict Prevention** - Prevents overlapping or duplicate slot creation
+- 🚫 **Conflict Prevention** - Validate slots or prevent duplicate slot creation
 - 📱 **Responsive Design** - Clean, Functional UI
 
 ### Technical Features
@@ -34,7 +25,7 @@ A **production-ready full-stack appointment booking application** built with mod
 ## 🛠 Tech Stack
 
 ### Frontend
-- **Framework:** React.js
+- **Framework:** React.js + Vite
 - **Styling:** Tailwind CSS
 - **HTTP Client:** Axios
 - **State Management:** React Hooks
@@ -55,16 +46,18 @@ A **production-ready full-stack appointment booking application** built with mod
 ## 🏗 Architecture
 
 ```
-appointment-booking-system/
+Bookify/
 ├── frontend/                    # Frontend React application
 │   ├── src/
-│   │   ├── components/       # Reusable UI components
 │   │   ├── pages/           # Route components
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── services/        # API service functions
-│   │   └── utils/           # Utility functions
+│   │   ├── index.css
+│   │   ├── App.jsx
+│   │   └── main.jsx
 │   ├── public/
+│   ├── index.html
 │   └── package.json
+│   └── vercel.json
+
 ├── backend/                   # Backend Node.js application
 │   ├── controllers/         # Business logic layer
 │   │   ├── authController.js
@@ -75,12 +68,12 @@ appointment-booking-system/
 │   │   ├── Slot.js
 │   │   └── Booking.js
 │   ├── routes/             # API routes
-│   │   ├── auth.js
-│   │   ├── slot.js
-│   │   └── booking.js
+│   │   ├── authRoutes.js
+│   │   ├── slotRoutes.js
+│   │   └── bookingRoutes.js
 │   ├── middlewares/        # Custom middleware
-│   │   ├── auth.js         # Authentication middleware
-│   │   └── roleAuth.js     # Role-based authorization
+│   │   ├── authMiddleware.js         # Authentication middleware
+│   │   └── roleCheckMW.js     # Role-based authorization
 │   ├── .env               # Environment variables
 │   ├── package.json
 │   └── server.js          # Application entry point
@@ -97,13 +90,13 @@ appointment-booking-system/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Bharat1Rajput/Appointment_App.git
-   cd appointment_app
+   git clone https://github.com/Bharat1Rajput/Bookify.git
+   cd Bookify
    ```
 
 2. **Backend Setup**
    ```bash
-   cd backen
+   cd backend
    npm install
    ```
 
@@ -116,8 +109,8 @@ appointment-booking-system/
 4. **Environment Configuration**
    Create `.env` file in the server directory:
    ```env
-   PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/appointment-booking
+   PORT=3000
+   MONGODB_URI=mongodb://localhost:27017/yourdbname
    JWT_SECRET=your_super_secret_jwt_key_here
    ```
 
@@ -142,27 +135,29 @@ appointment-booking-system/
 
 ### Authentication Endpoints
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/signup` | Register new user | No |
-| POST | `/api/auth/login` | Login user | No |
+| Method | Endpoint | Description | 
+|--------|----------|-------------|
+| POST | `/api/auth/signup` | Register new user | 
+| POST | `/api/auth/login` | Login user | 
 
-### Slot Management Endpoints (Service Provider Only)
+### Slot Management Endpoints 
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | POST | `/api/slot/create` | Create new time slot | Yes (Provider) |
 | GET | `/api/slot/view` | Get all slots for provider | Yes (Provider) |
-| PUT | `/api/slot/:id` | Update existing slot | Yes (Provider) |
-| DELETE | `/api/slot/:id` | Delete slot | Yes (Provider) |
+| GET | `/api/slot/available` | Get all slots  | Yes (both) |
+| PUT | `/api/slot/edit/:id` | Update existing slot | Yes (Provider) |
+| DELETE | `/api/slot/delete/:id` | Delete slot | Yes (Provider) |
 
 ### Booking Endpoints
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/api/slot/book/:slotId` | Book an available slot | Yes (User) |
+| POST | `/api/booking/book/:slotId` | Book an available slot | Yes (User) |
 | GET | `/api/booking/view` | Get user's bookings | Yes (User) |
-| DELETE | `/api/bookings/:id` | Cancel booking | Yes (User) |
+| GET | `/api/booking/provider/bookings` | Get provider's bookings | Yes (provider) |
+| DELETE | `/api/booking/cancel/:id` | Cancel booking | Yes (User) |
 
 ### Request/Response Examples
 
@@ -174,14 +169,6 @@ POST /api/slot/create
   "startTime": "10:00",
   "endTime": "11:00",
   "title": "Math Tutoring Session"
-}
-```
-
-#### Book Slot
-```json
-POST /api/slot/book/64f7b1234567890abcdef123
-{
-  "notes": "Need help with calculus"
 }
 ```
 
