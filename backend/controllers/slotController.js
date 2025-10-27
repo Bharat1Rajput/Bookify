@@ -2,38 +2,62 @@ const Slot = require("../models/slot");
 
 exports.createSlot = async (req, res) => {
   const { date, startTime, endTime } = req.body;
-
+  const providerId = req.user.userId;
+  console.log(date, startTime, endTime, providerId);
+console.log("sfkhkdjshfjksdkjf");
   try {
+    // Validation: start < end
     if (startTime >= endTime) {
       return res
         .status(400)
         .json({ message: "Start time must be before end time" });
     }
+
+    // Validation: date must be today or future
     if (new Date(date) < new Date().setHours(0, 0, 0, 0)) {
       return res.status(409).json({ message: "Date must be in the future" });
     }
+  
+    // Fetch all slots of provider on the same date
+    const pastSlots = await Slot.find({ providerId, date });
 
-    const newSlot = new Slot({
-      date,
-      startTime,
-      endTime,
-      providerId: req.user.userId,
-    });
 
+    // Overlap check function
+    const isOverlapping = (newSlot, pastSlots) => {
+      const { startTime, endTime } = newSlot;
+      for (let slot of pastSlots) {
+        
+        if (startTime < slot.endTime && endTime > slot.startTime) {
+          return true; // Overlap found
+        }
+      }
+      return false; // No overlap
+    };
+
+    const overlap = isOverlapping({ startTime, endTime }, pastSlots);
+
+    if (overlap) {
+      return res
+        .status(401)
+        .json({ message: "Slot overlaps with an existing slot" });
+    }
+
+    // Check for exact duplicate (same start + end)
     const existingSlot = await Slot.findOne({
+      providerId,
       date,
       startTime,
       endTime,
-      providerId: req.user.userId,
     });
-    console.log("existing slot", existingSlot);
+
     if (existingSlot) {
       return res.status(400).json({ message: "Slot already exists" });
     }
 
     // Save the new slot
+    const newSlot = new Slot({ date, startTime, endTime, providerId });
     await newSlot.save();
-    console.log("the new slot is ", newSlot);
+  
     res
       .status(201)
       .json({ message: "Slot created successfully", slot: newSlot });
@@ -42,6 +66,7 @@ exports.createSlot = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 exports.getSlots = async (req, res) => {
   try {
