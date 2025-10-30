@@ -231,7 +231,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**[Your Name]**
+**Bharat**
 - GitHub: [@Bharat1Rajput](https://github.com/Bharat1Rajput)
 - LinkedIn: [Bharat Singh](https://www.linkedin.com/in/bharat-singh-1288a4254)
 - Email: bharattsingh33@gmail.com
